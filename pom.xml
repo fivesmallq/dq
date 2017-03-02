@@ -237,7 +237,6 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <excludePackageNames>jodd.*:org.htmlcleaner:eu.infomas.annotation.*</excludePackageNames>
                             <maxmemory>1024</maxmemory>
                             <skip>false</skip>
                             <show>public</show>
