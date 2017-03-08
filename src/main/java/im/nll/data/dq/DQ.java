@@ -1,5 +1,6 @@
 package im.nll.data.dq;
 
+import im.nll.data.dq.mapper.ObjectColumnMapper;
 import im.nll.data.dq.utils.Validate;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -7,6 +8,7 @@ import org.modelmapper.convention.NameTokenizers;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import org.skife.jdbi.v2.Query;
+import org.skife.jdbi.v2.Update;
 import org.skife.jdbi.v2.util.LongColumnMapper;
 import play.db.DB;
 
@@ -68,8 +70,49 @@ public class DQ {
         return query.first();
     }
 
+    public static <T> T get(String sql, Object... params) {
+        Handle h = getHandle();
+        Query<Object> query = h.createQuery(sql).map(ObjectColumnMapper.WRAPPER);
+        int i = 0;
+        for (Object param : params) {
+            query.bind(i, param);
+            i++;
+        }
+        Object result = query.first();
+        return (T) result;
+    }
+
     public static Long count(SQLBuilder builder) {
         return count(builder.toCountSQL(), builder.getParams());
+    }
+
+    public static void execute(String sql, Object... params) {
+        Handle h = getHandle();
+        h.execute(sql, params);
+    }
+
+    public static int bindExecute(String sql, Map<String, Object> params) {
+        Handle h = getHandle();
+        return h.createStatement(sql).bindFromMap(params).execute();
+    }
+
+
+    public static int update(String sql, Object... params) {
+        Handle h = getHandle();
+        Update update = h.createStatement(sql);
+        int i = 0;
+        for (Object param : params) {
+            update.bind(i, param);
+            i++;
+        }
+        return update.execute();
+    }
+
+    public static int bindUpdate(String sql, Map<String, Object> params) {
+        Handle h = getHandle();
+        Update update = h.createStatement(sql);
+        update.bindFromMap(params);
+        return update.execute();
     }
 
     public static void batch(String sql, List<Map<String, Object>> params) {

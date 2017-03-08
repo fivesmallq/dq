@@ -27,7 +27,7 @@ To add a dependency using Gradle:
 
 ```
 dependencies {
-  compile 'im.nll.data:dq:0.9.1'
+  compile 'im.nll.data:dq:0.9.0'
 }
 ```
 

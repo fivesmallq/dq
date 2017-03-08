@@ -115,7 +115,10 @@ public class SQLBuilder {
     }
 
     public String toSelectSQL() {
-        StringBuilder finalSql = new StringBuilder("select * from ").append(table).append(" where ").append(whereBuilder).append(' ').append(orderBuilder);
+        StringBuilder finalSql = new StringBuilder("select * from ").append(table);
+        if (whereBuilder.length() > 0) {
+            finalSql.append(" where ").append(whereBuilder).append(' ').append(orderBuilder);
+        }
         if (limitBuilder.length() > 0) {
             finalSql.append(limitBuilder);
         }
@@ -123,7 +126,11 @@ public class SQLBuilder {
     }
 
     public String toCountSQL() {
-        return new StringBuilder("select count(1) from ").append(table).append(" where ").append(whereBuilder).append(' ').append(orderBuilder).toString();
+        StringBuilder finalSql = new StringBuilder("select count(1) from ").append(table);
+        if (whereBuilder.length() > 0) {
+            finalSql.append(" where ").append(whereBuilder).append(' ');
+        }
+        return finalSql.toString();
     }
 
     /**
