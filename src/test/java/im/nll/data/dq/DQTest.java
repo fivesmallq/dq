@@ -2,6 +2,7 @@ package im.nll.data.dq;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import im.nll.data.dq.connection.ConnectionProvider;
 import im.nll.data.dq.criterion.Rs;
 import org.junit.After;
@@ -13,6 +14,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * @author <a href="mailto:fivesmallq@gmail.com">fivesmallq</a>
@@ -150,7 +153,28 @@ public class DQTest {
 
     @Test
     public void batch() throws Exception {
+        DQ.with(new JdbcConnectionProvider());
+        Object[] param1 = new Object[]{UUID.randomUUID().toString(), "test1"};
+        Object[] param2 = new Object[]{UUID.randomUUID().toString(), "test2"};
+        List<Object[]> list = Lists.newArrayList(param1, param2);
+        Long count = DQ.count("select count(1) from role");
+        System.out.println(count);
+        DQ.batch("insert into role(id,name) values(?,?)", list);
+        count = DQ.count("select count(1) from role");
+        System.out.println(count);
+    }
 
+    @Test
+    public void bindBatch() throws Exception {
+        DQ.with(new JdbcConnectionProvider());
+        List<Map<String, Object>> list = Lists.newArrayList(
+                ImmutableMap.of("id", UUID.randomUUID().toString(), "name", "test1"),
+                ImmutableMap.of("id", UUID.randomUUID().toString(), "name", "test2"));
+        Long count = DQ.count("select count(1) from role");
+        System.out.println(count);
+        DQ.bindBatch("insert into role(id,name) values(:id,:name)", list);
+        count = DQ.count("select count(1) from role");
+        System.out.println(count);
     }
 
 }

@@ -5,10 +5,7 @@ import im.nll.data.dq.connection.PlayConnectionProvider;
 import im.nll.data.dq.mapper.BeanMapper;
 import im.nll.data.dq.mapper.ObjectColumnMapper;
 import im.nll.data.dq.utils.Validate;
-import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
-import org.skife.jdbi.v2.Query;
-import org.skife.jdbi.v2.Update;
+import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.util.LongColumnMapper;
 
 import java.sql.Connection;
@@ -141,15 +138,22 @@ public class DQ {
         return update.execute();
     }
 
-    public static void batch(String sql, List<Map<String, Object>> params) {
+    public static int[] batch(String sql, List<Object[]> params) {
         Handle h = getHandle();
-        Query<Long> query = h.createQuery(sql).map(LongColumnMapper.PRIMITIVE);
-        int i = 0;
-        for (Object param : params) {
-            query.bind(i, param);
-            i++;
+        PreparedBatch batch = h.prepareBatch(sql);
+        for (Object[] paramArray : params) {
+            batch.add(paramArray);
         }
-        //TODO
+        return batch.execute();
+    }
+
+    public static int[] bindBatch(String sql, List<Map<String, Object>> params) {
+        Handle h = getHandle();
+        PreparedBatch batch = h.prepareBatch(sql);
+        for (Map param : params) {
+            batch.add(param);
+        }
+        return batch.execute();
     }
 
     private static void validateParameter(Object[] params) {
