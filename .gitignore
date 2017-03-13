@@ -138,3 +138,4 @@ log/
 git.properties
 
 *.log
+*.db
