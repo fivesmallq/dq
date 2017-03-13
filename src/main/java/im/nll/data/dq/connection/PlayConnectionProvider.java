@@ -1,4 +1,4 @@
-package im.nll.data.dq;
+package im.nll.data.dq.connection;
 
 import play.db.DB;
 

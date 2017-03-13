@@ -2,6 +2,7 @@ package im.nll.data.dq;
 
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
+import im.nll.data.dq.connection.ConnectionProvider;
 import im.nll.data.dq.criterion.Rs;
 import org.junit.After;
 import org.junit.BeforeClass;

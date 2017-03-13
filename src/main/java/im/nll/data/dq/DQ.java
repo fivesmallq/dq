@@ -1,5 +1,7 @@
 package im.nll.data.dq;
 
+import im.nll.data.dq.connection.ConnectionProvider;
+import im.nll.data.dq.connection.PlayConnectionProvider;
 import im.nll.data.dq.mapper.BeanMapper;
 import im.nll.data.dq.mapper.ObjectColumnMapper;
 import im.nll.data.dq.utils.Validate;
