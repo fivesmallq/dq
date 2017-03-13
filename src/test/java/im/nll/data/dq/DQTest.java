@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import im.nll.data.dq.criterion.Rs;
 import org.junit.After;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.sql.Connection;
@@ -22,24 +22,20 @@ public class DQTest {
 
     static {
         try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
 
     }
 
-    class JdbcConnectionProvider implements ConnectionProvider {
+    static class JdbcConnectionProvider implements ConnectionProvider {
 
         @Override
         public Connection get() {
             try {
-                Connection conn =
-                        DriverManager.getConnection("jdbc:mysql://localhost/dq?user=root&password=dq");
+                Connection conn = DriverManager.
+                        getConnection("jdbc:h2:./test");
                 return conn;
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -49,9 +45,27 @@ public class DQTest {
         }
     }
 
-    @Before
-    public void setUp() throws Exception {
-
+    @BeforeClass
+    public static void setUp() throws Exception {
+        DQ.with(new JdbcConnectionProvider());
+        DQ.execute("drop table role");
+        DQ.execute("CREATE TABLE `role` (\n" +
+                "  `id` varchar(255) NOT NULL,\n" +
+                "  `name` varchar(45) NOT NULL,\n" +
+                "  `disable` varchar(45) DEFAULT NULL,\n" +
+                "  `create_time` datetime DEFAULT NULL,\n" +
+                "  `update_time` datetime DEFAULT NULL,\n" +
+                "  PRIMARY KEY (`id`)\n" +
+                ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        DQ.execute("INSERT INTO `role` (`id`, `name`, `disable`, `create_time`, `update_time`)\n" +
+                "VALUES\n" +
+                "\t('58bfcd1c867538143af5bb5e', '护士长', 'false', '2017-03-08 17:21:33', '2017-03-13 15:31:35');\n");
+        DQ.execute("INSERT INTO `role` (`id`, `name`, `disable`, `create_time`, `update_time`)\n" +
+                "VALUES\n" +
+                "\t('58bfcd51867538143af5bb62', '医生', 'false', '2017-03-08 17:22:25', '2017-03-08 17:22:25');\n");
+        DQ.execute("INSERT INTO `role` (`id`, `name`, `disable`, `create_time`, `update_time`)\n" +
+                "VALUES\n" +
+                "\t('58bfcd3c867538143af5bb60', '客服', 'false', '2017-03-08 17:22:04', '2017-03-08 17:22:04');\n");
     }
 
     @After
