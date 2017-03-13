@@ -19,10 +19,10 @@ import javax.persistence.Entity;
  * @date 2013-4-22下午6:05:31
  */
 public class SQLBuilder {
+    private Class tableClass;
 
-
-    public static SQLBuilder from(String table) {
-        return new SQLBuilder(table);
+    public static SQLBuilder from(String table, Class mapClass) {
+        return new SQLBuilder(table, mapClass);
     }
 
     public static SQLBuilder from(Class clazz) {
@@ -35,10 +35,12 @@ public class SQLBuilder {
     private StringBuilder limitBuilder = new StringBuilder();
     private String table;
 
-    private SQLBuilder(String table) {
+    private SQLBuilder(String table, Class mapClass) {
         Validate.notEmpty(table, "table can not be empty! ");
         this.table = table;
+        this.tableClass = mapClass;
     }
+
 
     private SQLBuilder(Class<?> clazz) {
         Entity entityAnnotation = clazz.getAnnotation(Entity.class);
@@ -46,6 +48,11 @@ public class SQLBuilder {
             throw new QueryException(clazz + " do not with Entity annotation, please set javax.persistence.Entity with name");
         }
         this.table = entityAnnotation.name();
+        this.tableClass = clazz;
+    }
+
+    public Class getTableClass() {
+        return this.tableClass;
     }
 
     /**

@@ -13,30 +13,30 @@
  */
 package im.nll.data.dq.mapper;
 
+import im.nll.data.dq.utils.TypeUtils;
 import org.skife.jdbi.v2.StatementContext;
 import org.skife.jdbi.v2.tweak.ResultColumnMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public enum ObjectColumnMapper implements ResultColumnMapper<Object> {
-    WRAPPER(true);
+public class ObjectColumnMapper<T> implements ResultColumnMapper<T> {
 
-    private final boolean nullable;
+    private final Class<T> clazz;
 
-    ObjectColumnMapper(boolean nullable) {
-        this.nullable = nullable;
+    public ObjectColumnMapper(Class clazz) {
+        this.clazz = clazz;
     }
 
     @Override
-    public Object mapColumn(ResultSet r, int columnNumber, StatementContext ctx) throws SQLException {
+    public T mapColumn(ResultSet r, int columnNumber, StatementContext ctx) throws SQLException {
         Object value = r.getObject(columnNumber);
-        return nullable && r.wasNull() ? null : value;
+        return r.wasNull() ? null : TypeUtils.cast(value, clazz);
     }
 
     @Override
-    public Object mapColumn(ResultSet r, String columnLabel, StatementContext ctx) throws SQLException {
+    public T mapColumn(ResultSet r, String columnLabel, StatementContext ctx) throws SQLException {
         Object value = r.getObject(columnLabel);
-        return nullable && r.wasNull() ? null : value;
+        return r.wasNull() ? null : TypeUtils.cast(value, clazz);
     }
 }
