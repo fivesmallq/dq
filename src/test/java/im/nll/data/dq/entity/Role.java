@@ -1,4 +1,4 @@
-package im.nll.data.dq;
+package im.nll.data.dq.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
