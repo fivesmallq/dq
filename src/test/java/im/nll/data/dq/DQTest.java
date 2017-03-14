@@ -40,7 +40,7 @@ public class DQTest {
         public Connection get() {
             try {
                 Connection conn = DriverManager.
-                        getConnection("jdbc:h2:./test");
+                        getConnection("jdbc:h2:mem:test");
                 return conn;
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -53,7 +53,6 @@ public class DQTest {
     @BeforeClass
     public static void setUp() throws Exception {
         DQ.with(new JdbcConnectionProvider());
-        DQ.execute("drop table role");
         DQ.execute("CREATE TABLE `role` (\n" +
                 "  `id` varchar(255) NOT NULL,\n" +
                 "  `name` varchar(45) NOT NULL,\n" +
