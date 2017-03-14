@@ -1,0 +1,13 @@
+language: java
+before_script:
+  - pip install --user codecov
+jdk:
+  - oraclejdk8
+# whitelist
+branches:
+  only:
+    - master
+notifications:
+  email: false
+after_success:
+    - codecov
