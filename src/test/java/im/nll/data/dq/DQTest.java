@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import im.nll.data.dq.connection.ConnectionProvider;
 import im.nll.data.dq.criterion.Rs;
+import im.nll.data.dq.entity.Role;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
