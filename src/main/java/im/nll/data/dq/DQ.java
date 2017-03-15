@@ -158,7 +158,7 @@ public class DQ {
 
     private static void validateParameter(Object[] params) {
         if (params.length > 0) {
-            Validate.isFalse(params[0] instanceof Map, "maybe you can use bindGet method! ");
+            Validate.isFalse(params[0] instanceof Map, "maybe you can use bind method! ");
         }
     }
 
