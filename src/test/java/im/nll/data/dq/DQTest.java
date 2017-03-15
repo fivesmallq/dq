@@ -132,6 +132,13 @@ public class DQTest {
     }
 
     @Test
+    public void bindCount() throws Exception {
+        DQ.with(new JdbcConnectionProvider());
+        Long count = DQ.bindCount("select count(1) from role where id=:id", ImmutableMap.of("id", "58bfcd3c867538143af5bb60"));
+        System.out.println(count);
+    }
+
+    @Test
     public void execute() throws Exception {
 
     }

@@ -71,6 +71,16 @@ public class DQ {
         return query.first();
     }
 
+    public static Long bindCount(String sql, Map<String, Object> params) {
+        Handle h = getHandle();
+        Query<Long> query = h.createQuery(sql).map(LongColumnMapper.PRIMITIVE);
+        for (Map.Entry<String, Object> param : params.entrySet()) {
+            query.bind(param.getKey(), param.getValue());
+        }
+        return query.first();
+    }
+
+
     public static <T> T get(String sql, Class<T> clazz, Object... params) {
         validateParameter(params);
         Handle h = getHandle();
