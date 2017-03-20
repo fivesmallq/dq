@@ -7,6 +7,7 @@ import im.nll.data.dq.criterion.Rs;
 import im.nll.data.dq.entity.Role;
 import org.junit.After;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -65,6 +66,7 @@ public class DQTest extends BaseTest{
     }
 
     @Test
+    @Ignore
     public void query1() throws Exception {
         DQ.with(getH2Provider());
         List<String> roleIds = new ArrayList<>();
