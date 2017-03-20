@@ -19,9 +19,7 @@ import java.util.UUID;
  * @version Revision: 1.0
  * @date 2017/3/3 上午11:06
  */
-public class DQTest extends BaseTest{
-
-
+public class DQTest extends BaseTest {
 
 
     @BeforeClass
@@ -71,7 +69,7 @@ public class DQTest extends BaseTest{
         roleIds.add("58bfcd1c867538143af5bb5e");
         roleIds.add("58bfcd51867538143af5bb62");
         roleIds.add("58bfcd3c867538143af5bb60");
-        String sql="select * from role where id in(:ids)";
+        String sql = "select * from role where id in(:ids)";
         List<Role> roles = DQ.namedQuery(sql, Role.class, ImmutableMap.of("ids", roleIds));
         System.out.println(JSON.toJSONString(roles, true));
     }
@@ -107,11 +105,6 @@ public class DQTest extends BaseTest{
     }
 
     @Test
-    public void count1() throws Exception {
-
-    }
-
-    @Test
     public void bindCount() throws Exception {
         DQ.with(getH2Provider());
         Long count = DQ.namedCount("select count(1) from role where id=:id", ImmutableMap.of("id", "58bfcd3c867538143af5bb60"));
@@ -120,22 +113,26 @@ public class DQTest extends BaseTest{
 
     @Test
     public void execute() throws Exception {
-
+        DQ.with(getH2Provider());
+        DQ.execute("select count(1) from role");
     }
 
     @Test
     public void bindExecute() throws Exception {
-
+        DQ.with(getH2Provider());
+        DQ.execute("select count(1) from role where id=:id", ImmutableMap.of("id", "1"));
     }
 
     @Test
     public void update() throws Exception {
-
+        DQ.with(getH2Provider());
+        DQ.update("update role set name=? where id=?", "updated-name", "123");
     }
 
     @Test
     public void bindUpdate() throws Exception {
-
+        DQ.with(getH2Provider());
+        DQ.namedUpdate("update role set name=:name where id=:id", ImmutableMap.of("name", "updated-name", "id", "123"));
     }
 
     @Test
