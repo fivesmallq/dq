@@ -1,4 +1,4 @@
-#dq 
+# dq 
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/im.nll.data/dq/badge.svg)](https://maven-badges.herokuapp.com/maven-central/im.nll.data/dq/)
 [![Build Status](https://travis-ci.org/fivesmallq/dq.svg)](https://travis-ci.org/fivesmallq/dq)
 [![codecov.io](http://codecov.io/github/fivesmallq/dq/coverage.svg?branch=master)](http://codecov.io/github/fivesmallq/dq?branch=master)
@@ -11,7 +11,7 @@ Implements:
  * JDBI - [JDBI](https://github.com/jdbi/jdbi)
 
 
-#Usage
+# Usage
 To add a dependency on dq using Maven, use the following:
 
 ```xml
@@ -31,10 +31,10 @@ dependencies {
 ```
 
 
-#Examples
+# Examples
 
 TODO
 
-#Contributing
+# Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/fivesmallq/dq.
