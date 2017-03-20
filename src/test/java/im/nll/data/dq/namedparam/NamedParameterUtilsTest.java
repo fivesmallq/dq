@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import im.nll.data.dq.BaseTest;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -17,11 +18,14 @@ public class NamedParameterUtilsTest extends BaseTest {
     public void parseSqlStatement() throws Exception {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
         parameters.addValue("ids", Lists.newArrayList("1", "2", "3"));
-        ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement("select * from role where id in(:ids)");
+        parameters.addValue("id", "1");
+        parameters.addValue("id2", "2");
+        parameters.addValue("id3", "2");
+        ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement("select * from role where id>:id3 and id in(:ids) and id>:id and id!= :id2");
         String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, parameters);
         System.out.println(sqlToUse);
         Object[] params = NamedParameterUtils.buildValueArray(parsedSql, parameters, null);
-        System.out.println(params);
+        System.out.println(Arrays.toString(params));
         List<SqlParameter> declaredParameters = NamedParameterUtils.buildSqlParameterList(parsedSql, parameters);
 
         System.out.println(parsedSql.getOriginalSql());
