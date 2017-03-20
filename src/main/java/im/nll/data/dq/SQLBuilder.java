@@ -25,15 +25,25 @@ public class SQLBuilder {
         return new SQLBuilder(table, mapClass);
     }
 
+    public static SQLBuilder of(String sql) {
+        return new SQLBuilder(sql);
+    }
+
     public static SQLBuilder from(Class clazz) {
         return new SQLBuilder(clazz);
     }
 
     private Object[] params = new Object[0];
+    private StringBuilder baseBuilder = new StringBuilder();
     private StringBuilder whereBuilder = new StringBuilder();
     private StringBuilder orderBuilder = new StringBuilder();
     private StringBuilder limitBuilder = new StringBuilder();
     private String table;
+
+    private SQLBuilder(String sql) {
+        Validate.notEmpty(sql, "sql can not be empty! ");
+        this.baseBuilder = new StringBuilder(sql);
+    }
 
     private SQLBuilder(String table, Class mapClass) {
         Validate.notEmpty(table, "table can not be empty! ");
@@ -117,14 +127,27 @@ public class SQLBuilder {
         return this;
     }
 
-    private String toStatementString() {
-        return new StringBuilder(whereBuilder).append(' ').append(orderBuilder).toString();
+    public String toStatementSQL() {
+        StringBuilder finalSql = new StringBuilder(baseBuilder);
+        if (whereBuilder.length() > 0) {
+            finalSql.append(" where ").append(whereBuilder).append(' ');
+        }
+        if (orderBuilder.length() > 0) {
+            finalSql.append(' ').append(orderBuilder).append(' ');
+        }
+        if (limitBuilder.length() > 0) {
+            finalSql.append(' ').append(limitBuilder).append(' ');
+        }
+        return finalSql.toString();
     }
 
     public String toSelectSQL() {
         StringBuilder finalSql = new StringBuilder("select * from ").append(table);
         if (whereBuilder.length() > 0) {
-            finalSql.append(" where ").append(whereBuilder).append(' ').append(orderBuilder);
+            finalSql.append(" where ").append(whereBuilder).append(' ');
+        }
+        if (orderBuilder.length() > 0) {
+            finalSql.append(' ').append(orderBuilder).append(' ');
         }
         if (limitBuilder.length() > 0) {
             finalSql.append(limitBuilder);
@@ -149,8 +172,8 @@ public class SQLBuilder {
         return params;
     }
 
-    private static final int MAX_OFFSET = 100;
-    private static final int MAX_LIMIT = 50;
+    private static final int MAX_OFFSET = 10000;
+    private static final int MAX_LIMIT = 10000;
     private static final int DEFAULT_LIMIT = 10;
 
     public static int safeLimit(int limit) {
