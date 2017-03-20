@@ -52,7 +52,7 @@ public class DQTest extends BaseTest{
 
     @Test
     public void query() throws Exception {
-        DQ.with(getMySQLProvider());
+        DQ.with(getH2Provider());
         List<String> roleIds = new ArrayList<>();
         roleIds.add("58bfcd1c867538143af5bb5e");
         roleIds.add("58bfcd51867538143af5bb62");
@@ -66,7 +66,7 @@ public class DQTest extends BaseTest{
 
     @Test
     public void query1() throws Exception {
-        DQ.with(getMySQLProvider());
+        DQ.with(getH2Provider());
         List<String> roleIds = new ArrayList<>();
         roleIds.add("58bfcd1c867538143af5bb5e");
         roleIds.add("58bfcd51867538143af5bb62");
@@ -78,21 +78,21 @@ public class DQTest extends BaseTest{
 
     @Test
     public void bindQuery() throws Exception {
-        DQ.with(new JdbcConnectionProvider());
+        DQ.with(getH2Provider());
         List<Role> roles = DQ.bindQuery("select * from role where disable=:disable", Role.class, ImmutableMap.of("disable", "false"));
         System.out.println(JSON.toJSONString(roles, true));
     }
 
     @Test
     public void count() throws Exception {
-        DQ.with(new JdbcConnectionProvider());
+        DQ.with(getH2Provider());
         Long count = DQ.count("select count(1) from role");
         System.out.println(count);
     }
 
     @Test
     public void get() throws Exception {
-        DQ.with(new JdbcConnectionProvider());
+        DQ.with(getH2Provider());
         Role role = DQ.get("select * from role where id=?", Role.class, "58bfcd3c867538143af5bb60");
         System.out.println(JSON.toJSONString(role, true));
         String name = DQ.get("select name from role where id=?", String.class, "58bfcd3c867538143af5bb60");
@@ -101,7 +101,7 @@ public class DQTest extends BaseTest{
 
     @Test
     public void bindGet() throws Exception {
-        DQ.with(new JdbcConnectionProvider());
+        DQ.with(getH2Provider());
         Role role = DQ.bindGet("select * from role where id=:id", Role.class, ImmutableMap.of("id", "58bfcd3c867538143af5bb60"));
         System.out.println(JSON.toJSONString(role, true));
     }
@@ -113,7 +113,7 @@ public class DQTest extends BaseTest{
 
     @Test
     public void bindCount() throws Exception {
-        DQ.with(new JdbcConnectionProvider());
+        DQ.with(getH2Provider());
         Long count = DQ.bindCount("select count(1) from role where id=:id", ImmutableMap.of("id", "58bfcd3c867538143af5bb60"));
         System.out.println(count);
     }
@@ -140,7 +140,7 @@ public class DQTest extends BaseTest{
 
     @Test
     public void batch() throws Exception {
-        DQ.with(new JdbcConnectionProvider());
+        DQ.with(getH2Provider());
         Object[] param1 = new Object[]{UUID.randomUUID().toString(), "test1"};
         Object[] param2 = new Object[]{UUID.randomUUID().toString(), "test2"};
         List<Object[]> list = Lists.newArrayList(param1, param2);
@@ -153,7 +153,7 @@ public class DQTest extends BaseTest{
 
     @Test
     public void bindBatch() throws Exception {
-        DQ.with(new JdbcConnectionProvider());
+        DQ.with(getH2Provider());
         List<Map<String, Object>> list = Lists.newArrayList(
                 ImmutableMap.of("id", UUID.randomUUID().toString(), "name", "test1"),
                 ImmutableMap.of("id", UUID.randomUUID().toString(), "name", "test2"));
