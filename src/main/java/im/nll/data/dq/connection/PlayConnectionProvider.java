@@ -1,5 +1,6 @@
 package im.nll.data.dq.connection;
 
+import play.Play;
 import play.db.DB;
 
 import java.sql.Connection;
@@ -12,6 +13,11 @@ import java.sql.Connection;
 public class PlayConnectionProvider implements ConnectionProvider {
     @Override
     public Connection get() {
-        return DB.getConnection();
+        String logSql = Play.configuration.getProperty("dq.logSql", "false");
+        if ("true".equals(logSql)) {
+            return new net.sf.log4jdbc.ConnectionSpy(DB.getConnection());
+        } else {
+            return DB.getConnection();
+        }
     }
 }

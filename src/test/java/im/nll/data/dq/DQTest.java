@@ -3,16 +3,12 @@ package im.nll.data.dq;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import im.nll.data.dq.connection.ConnectionProvider;
 import im.nll.data.dq.criterion.Rs;
 import im.nll.data.dq.entity.Role;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,32 +19,10 @@ import java.util.UUID;
  * @version Revision: 1.0
  * @date 2017/3/3 上午11:06
  */
-public class DQTest {
+public class DQTest extends BaseTest{
 
-    static {
-        try {
-            Class.forName("org.h2.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
 
-    }
 
-    static class JdbcConnectionProvider implements ConnectionProvider {
-
-        @Override
-        public Connection get() {
-            try {
-                Connection conn = DriverManager.
-                        getConnection("jdbc:h2:mem:test");
-                return conn;
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-
-            return null;
-        }
-    }
 
     @BeforeClass
     public static void setUp() throws Exception {
@@ -78,13 +52,12 @@ public class DQTest {
 
     @Test
     public void query() throws Exception {
-        DQ.with(new JdbcConnectionProvider());
+        DQ.with(getMySQLProvider());
         List<String> roleIds = new ArrayList<>();
         roleIds.add("58bfcd1c867538143af5bb5e");
         roleIds.add("58bfcd51867538143af5bb62");
         roleIds.add("58bfcd3c867538143af5bb60");
         SQLBuilder sqlBuilder = SQLBuilder.from(Role.class).dyAnd(
-                Rs.eq("disable", "false"),
                 Rs.in("id", roleIds)
         );
         List<Role> roles = DQ.query(sqlBuilder);
@@ -93,7 +66,14 @@ public class DQTest {
 
     @Test
     public void query1() throws Exception {
-
+        DQ.with(getMySQLProvider());
+        List<String> roleIds = new ArrayList<>();
+        roleIds.add("58bfcd1c867538143af5bb5e");
+        roleIds.add("58bfcd51867538143af5bb62");
+        roleIds.add("58bfcd3c867538143af5bb60");
+        String sql="select * from role where id in(:ids)";
+        List<Role> roles = DQ.bindQuery(sql,Role.class,ImmutableMap.of("ids",roleIds));
+        System.out.println(JSON.toJSONString(roles, true));
     }
 
     @Test
