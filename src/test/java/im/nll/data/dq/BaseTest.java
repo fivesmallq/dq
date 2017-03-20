@@ -27,7 +27,7 @@ public class BaseTest {
         return new MySQLJdbcConnectionProvider();
     }
 
-    static class JdbcConnectionProvider implements ConnectionProvider {
+    public static class JdbcConnectionProvider implements ConnectionProvider {
 
         @Override
         public Connection get() {

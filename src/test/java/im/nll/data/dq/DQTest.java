@@ -7,7 +7,6 @@ import im.nll.data.dq.criterion.Rs;
 import im.nll.data.dq.entity.Role;
 import org.junit.After;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -66,7 +65,6 @@ public class DQTest extends BaseTest{
     }
 
     @Test
-    @Ignore
     public void query1() throws Exception {
         DQ.with(getH2Provider());
         List<String> roleIds = new ArrayList<>();
@@ -74,14 +72,14 @@ public class DQTest extends BaseTest{
         roleIds.add("58bfcd51867538143af5bb62");
         roleIds.add("58bfcd3c867538143af5bb60");
         String sql="select * from role where id in(:ids)";
-        List<Role> roles = DQ.bindQuery(sql,Role.class,ImmutableMap.of("ids",roleIds));
+        List<Role> roles = DQ.namedQuery(sql, Role.class, ImmutableMap.of("ids", roleIds));
         System.out.println(JSON.toJSONString(roles, true));
     }
 
     @Test
     public void bindQuery() throws Exception {
         DQ.with(getH2Provider());
-        List<Role> roles = DQ.bindQuery("select * from role where disable=:disable", Role.class, ImmutableMap.of("disable", "false"));
+        List<Role> roles = DQ.namedQuery("select * from role where disable=:disable", Role.class, ImmutableMap.of("disable", "false"));
         System.out.println(JSON.toJSONString(roles, true));
     }
 
@@ -104,7 +102,7 @@ public class DQTest extends BaseTest{
     @Test
     public void bindGet() throws Exception {
         DQ.with(getH2Provider());
-        Role role = DQ.bindGet("select * from role where id=:id", Role.class, ImmutableMap.of("id", "58bfcd3c867538143af5bb60"));
+        Role role = DQ.namedGet("select * from role where id=:id", Role.class, ImmutableMap.of("id", "58bfcd3c867538143af5bb60"));
         System.out.println(JSON.toJSONString(role, true));
     }
 
@@ -116,7 +114,7 @@ public class DQTest extends BaseTest{
     @Test
     public void bindCount() throws Exception {
         DQ.with(getH2Provider());
-        Long count = DQ.bindCount("select count(1) from role where id=:id", ImmutableMap.of("id", "58bfcd3c867538143af5bb60"));
+        Long count = DQ.namedCount("select count(1) from role where id=:id", ImmutableMap.of("id", "58bfcd3c867538143af5bb60"));
         System.out.println(count);
     }
 
@@ -161,7 +159,7 @@ public class DQTest extends BaseTest{
                 ImmutableMap.of("id", UUID.randomUUID().toString(), "name", "test2"));
         Long count = DQ.count("select count(1) from role");
         System.out.println(count);
-        DQ.bindBatch("insert into role(id,name) values(:id,:name)", list);
+        DQ.namedBatch("insert into role(id,name) values(:id,:name)", list);
         count = DQ.count("select count(1) from role");
         System.out.println(count);
     }

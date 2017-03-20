@@ -4,12 +4,16 @@ import im.nll.data.dq.connection.ConnectionProvider;
 import im.nll.data.dq.connection.PlayConnectionProvider;
 import im.nll.data.dq.mapper.BeanMapper;
 import im.nll.data.dq.mapper.ObjectColumnMapper;
+import im.nll.data.dq.namedparam.MapSqlParameterSource;
+import im.nll.data.dq.namedparam.NamedParameterUtils;
+import im.nll.data.dq.namedparam.ParsedSql;
 import im.nll.data.dq.utils.Validate;
 import org.skife.jdbi.v2.*;
 import org.skife.jdbi.v2.util.LongColumnMapper;
 
 import java.sql.Connection;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -50,14 +54,10 @@ public class DQ {
         return query.list();
     }
 
-    public static <T> List<T> bindQuery(String sql, Class<T> clazz, Map<String, Object> params) {
-        Handle h = getHandle();
-        Query<T> query = mapQuery(sql, clazz, h);
-        for (Map.Entry<String, Object> param : params.entrySet()) {
-            query.bind(param.getKey(), param.getValue());
-        }
-        return query.list();
+    public static <T> List<T> namedQuery(String sql, Class<T> clazz, Map<String, Object> params) {
+        return mapNamedQuery(sql, clazz, params).list();
     }
+
 
     public static Long count(String sql, Object... params) {
         validateParameter(params);
@@ -71,21 +71,15 @@ public class DQ {
         return query.first();
     }
 
-    public static Long bindCount(String sql, Map<String, Object> params) {
-        Handle h = getHandle();
-        Query<Long> query = h.createQuery(sql).map(LongColumnMapper.PRIMITIVE);
-        for (Map.Entry<String, Object> param : params.entrySet()) {
-            query.bind(param.getKey(), param.getValue());
-        }
-        return query.first();
+    public static Long namedCount(String sql, Map<String, Object> params) {
+        return namedGet(sql, Long.class, params);
     }
 
 
     public static <T> T get(String sql, Class<T> clazz, Object... params) {
         validateParameter(params);
         Handle h = getHandle();
-        Query<T> query;
-        query = mapQuery(sql, clazz, h);
+        Query<T> query = mapQuery(sql, clazz, h);
         int i = 0;
         for (Object param : params) {
             query.bind(i, param);
@@ -96,24 +90,10 @@ public class DQ {
     }
 
 
-    public static <T> T bindGet(String sql, Class<T> clazz, Map<String, Object> params) {
-        Handle h = getHandle();
-        Query<T> query = mapQuery(sql, clazz, h);
-        for (Map.Entry<String, Object> param : params.entrySet()) {
-            query.bind(param.getKey(), param.getValue());
-        }
-        return query.first();
+    public static <T> T namedGet(String sql, Class<T> clazz, Map<String, Object> params) {
+        return mapNamedQuery(sql, clazz, params).first();
     }
 
-    private static <T> Query<T> mapQuery(String sql, Class<T> clazz, Handle h) {
-        Query<T> query;
-        if (isPrimitive(clazz)) {
-            query = h.createQuery(sql).map(new ObjectColumnMapper(clazz));
-        } else {
-            query = h.createQuery(sql).map(new BeanMapper<>(clazz));
-        }
-        return query;
-    }
 
     public static Long count(SQLBuilder builder) {
         return count(builder.toCountSQL(), builder.getParams());
@@ -124,7 +104,7 @@ public class DQ {
         h.execute(sql, params);
     }
 
-    public static int bindExecute(String sql, Map<String, Object> params) {
+    public static int namedExecute(String sql, Map<String, Object> params) {
         Handle h = getHandle();
         return h.createStatement(sql).bindFromMap(params).execute();
     }
@@ -141,7 +121,7 @@ public class DQ {
         return update.execute();
     }
 
-    public static int bindUpdate(String sql, Map<String, Object> params) {
+    public static int namedUpdate(String sql, Map<String, Object> params) {
         Handle h = getHandle();
         Update update = h.createStatement(sql);
         update.bindFromMap(params);
@@ -157,7 +137,7 @@ public class DQ {
         return batch.execute();
     }
 
-    public static int[] bindBatch(String sql, List<Map<String, Object>> params) {
+    public static int[] namedBatch(String sql, List<Map<String, Object>> params) {
         Handle h = getHandle();
         PreparedBatch batch = h.prepareBatch(sql);
         for (Map param : params) {
@@ -168,8 +148,54 @@ public class DQ {
 
     private static void validateParameter(Object[] params) {
         if (params.length > 0) {
-            Validate.isFalse(params[0] instanceof Map, "maybe you can use bind method! ");
+            Validate.isFalse(params[0] instanceof Map, "maybe you can use named method! ");
         }
+    }
+
+    private static <T> Query<T> mapNamedQuery(String sql, Class<T> clazz, Map<String, Object> params) {
+        Handle h = getHandle();
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValues(params);
+        ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(sql);
+        String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, parameters);
+        Object[] paramsArray = NamedParameterUtils.buildValueArray(parsedSql, parameters, null);
+        Query<T> query = mapQuery(sqlToUse, clazz, h);
+        mapNamedParams(paramsArray, query);
+        return query;
+    }
+
+    private static <T> void mapNamedParams(Object[] paramsArray, Query<T> query) {
+        int i = 0;
+        for (Object param : paramsArray) {
+            if (param instanceof Collection) {
+                Collection<?> entries = (Collection<?>) param;
+                for (Object entry : entries) {
+                    if (entry instanceof Object[]) {
+                        Object[] valueArray = ((Object[]) entry);
+                        for (Object argValue : valueArray) {
+                            query.bind(i, argValue);
+                            i++;
+                        }
+                    } else {
+                        query.bind(i, entry);
+                        i++;
+                    }
+                }
+            } else {
+                query.bind(i, param);
+                i++;
+            }
+        }
+    }
+
+    private static <T> Query<T> mapQuery(String sql, Class<T> clazz, Handle h) {
+        Query<T> query;
+        if (isPrimitive(clazz)) {
+            query = h.createQuery(sql).map(new ObjectColumnMapper(clazz));
+        } else {
+            query = h.createQuery(sql).map(new BeanMapper<>(clazz));
+        }
+        return query;
     }
 
     /************************* 后添加的方法 ***********************************/
