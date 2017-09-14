@@ -105,8 +105,7 @@ public class DQ {
     }
 
     public static int namedExecute(String sql, Map<String, Object> params) {
-        Handle h = getHandle();
-        return h.createStatement(sql).bindFromMap(params).execute();
+        return namedUpdate(sql, params);
     }
 
 
@@ -123,8 +122,13 @@ public class DQ {
 
     public static int namedUpdate(String sql, Map<String, Object> params) {
         Handle h = getHandle();
-        Update update = h.createStatement(sql);
-        update.bindFromMap(params);
+        MapSqlParameterSource parameters = new MapSqlParameterSource();
+        parameters.addValues(params);
+        ParsedSql parsedSql = NamedParameterUtils.parseSqlStatement(sql);
+        String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, parameters);
+        Object[] paramsArray = NamedParameterUtils.buildValueArray(parsedSql, parameters, null);
+        Update update = h.createStatement(sqlToUse);
+        mapNamedParams(paramsArray, update);
         return update.execute();
     }
 
@@ -164,7 +168,7 @@ public class DQ {
         return query;
     }
 
-    private static <T> void mapNamedParams(Object[] paramsArray, Query<T> query) {
+    private static <T extends SQLStatement<T>> void mapNamedParams(Object[] paramsArray, SQLStatement<T> query) {
         int i = 0;
         for (Object param : paramsArray) {
             if (param instanceof Collection) {
