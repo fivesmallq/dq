@@ -18,7 +18,7 @@ To add a dependency on dq using Maven, use the following:
 <dependency>
     <groupId>im.nll.data</groupId>
     <artifactId>dq</artifactId>
-    <version>0.9.5</version>
+    <version>0.9.6</version>
 </dependency>
 ```
 
@@ -26,7 +26,7 @@ To add a dependency using Gradle:
 
 ```
 dependencies {
-  compile 'im.nll.data:dq:0.9.5'
+  compile 'im.nll.data:dq:0.9.6'
 }
 ```
 
