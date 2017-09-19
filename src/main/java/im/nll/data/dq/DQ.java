@@ -99,9 +99,9 @@ public class DQ {
         return count(builder.toCountSQL(), builder.getParams());
     }
 
-    public static void execute(String sql, Object... params) {
+    public static int execute(String sql, Object... params) {
         Handle h = getHandle();
-        h.execute(sql, params);
+        return h.update(sql, params);
     }
 
     public static int namedExecute(String sql, Map<String, Object> params) {

@@ -143,9 +143,12 @@ public class DQTest extends BaseTest {
         roleIds.add("58bfcd1c867538143af5bb5e");
         roleIds.add("58bfcd51867538143af5bb62");
         roleIds.add("58bfcd3c867538143af5bb60");
-        DQ.namedUpdate("update role set name=:name where id in(:ids)", ImmutableMap.of("name", "named-updated-name", "ids", roleIds));
+        int row = DQ.namedUpdate("update role set name=:name where id in(:ids)", ImmutableMap.of("name", "named-updated-name", "ids", roleIds));
+        System.out.println(row);
         List<Role> roles = DQ.namedQuery("select * from role where disable=:disable", Role.class, ImmutableMap.of("disable", "false"));
         System.out.println(JSON.toJSONString(roles, true));
+        row = DQ.namedUpdate("update role set name=:name where id in(:ids)", ImmutableMap.of("name", "named-updated-name", "ids", Lists.newArrayList()));
+        System.out.println(row);
     }
 
     @Test
